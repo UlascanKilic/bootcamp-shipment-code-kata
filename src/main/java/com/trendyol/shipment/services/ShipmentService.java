@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ShipmentService implements IShipmentService {
@@ -31,8 +32,8 @@ public class ShipmentService implements IShipmentService {
         return findShipmentSize(sizeCounts);
     }
 
-    @Override
-    public Map<ShipmentSize, Long> getProductsReverseOrderedBySize() {
+
+    private Map<ShipmentSize, Long> getProductsReverseOrderedBySize() {
         return productList.stream()
                 .collect(Collectors.groupingBy(
                         Product::getSize,
@@ -41,13 +42,13 @@ public class ShipmentService implements IShipmentService {
                 ));
     }
 
-    @Override
-    public ShipmentSize findShipmentSize(Map<ShipmentSize, Long> sizeCounts) {
-        for (Map.Entry<ShipmentSize, Long> entry : sizeCounts.entrySet()) {
-            if (entry.getValue() >= Constants.THRESHOLD_VALUE) {
-                return entry.getKey().getLarger();
-            }
-        }
-        return Collections.max(sizeCounts.keySet());
+    private ShipmentSize findShipmentSize(Map<ShipmentSize, Long> sizeCounts) {
+        Optional<Map.Entry<ShipmentSize, Long>> maxSizeEntry = sizeCounts.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() >= Constants.THRESHOLD_VALUE)
+                .max(Map.Entry.comparingByKey());
+
+        return maxSizeEntry.isPresent() ? maxSizeEntry.get().getKey().getLarger() :
+                Collections.max(sizeCounts.keySet());
     }
 }
