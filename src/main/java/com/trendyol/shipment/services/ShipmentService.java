@@ -2,6 +2,7 @@ package com.trendyol.shipment.services;
 
 import com.trendyol.shipment.Product;
 import com.trendyol.shipment.ShipmentSize;
+import com.trendyol.shipment.exceptions.EmptyBasketException;
 import utils.Constants;
 import utils.exceptionMessages.ShipmentExceptionMessage;
 
@@ -24,19 +25,13 @@ public class ShipmentService implements IShipmentService {
 
     @Override
     public ShipmentSize getShipmentSize() {
-        Map<ShipmentSize, Long> sizeCounts = getProductsReverseOrderedBySize();
-
-        if (sizeCounts.getOrDefault(ShipmentSize.X_LARGE, Constants.DEFAULT_VALUE) >= Constants.THRESHOLD_VALUE) {
-            return ShipmentSize.X_LARGE;
-        }
-
-        return findShipmentSize(sizeCounts);
+        return findShipmentSize(getReverseOrderedProductsBySize());
     }
 
 
-    private Map<ShipmentSize, Long> getProductsReverseOrderedBySize() {
+    private Map<ShipmentSize, Long> getReverseOrderedProductsBySize() {
 
-        if(productList.isEmpty()) throw new RuntimeException(ShipmentExceptionMessage.BASKET_IS_EMPTY.getMessage());
+        if(productList.isEmpty()) throw new EmptyBasketException(ShipmentExceptionMessage.BASKET_IS_EMPTY.getMessage());
 
         return productList.stream()
                 .collect(Collectors.groupingBy(
@@ -47,6 +42,11 @@ public class ShipmentService implements IShipmentService {
     }
 
     private ShipmentSize findShipmentSize(Map<ShipmentSize, Long> sizeCounts) {
+
+        if (sizeCounts.getOrDefault(ShipmentSize.X_LARGE, Constants.DEFAULT_VALUE) >= Constants.THRESHOLD_VALUE) {
+            return ShipmentSize.X_LARGE;
+        }
+
         Optional<Map.Entry<ShipmentSize, Long>> maxSizeEntry = sizeCounts.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue() >= Constants.THRESHOLD_VALUE)
