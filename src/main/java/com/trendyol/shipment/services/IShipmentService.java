@@ -4,5 +4,5 @@ import com.trendyol.shipment.ShipmentSize;
 
 @FunctionalInterface
 public interface IShipmentService {
-        ShipmentSize getShipmentSize();
+        ShipmentSize calculateShipmentSize();
 }

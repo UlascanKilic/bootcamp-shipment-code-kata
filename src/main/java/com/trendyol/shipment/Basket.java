@@ -8,7 +8,7 @@ public class Basket {
     private List<Product> products;
 
     public ShipmentSize getShipmentSize() {
-        return new ShipmentService(products).getShipmentSize();
+        return new ShipmentService(products).calculateShipmentSize();
     }
 
     public List<Product> getProducts() {
