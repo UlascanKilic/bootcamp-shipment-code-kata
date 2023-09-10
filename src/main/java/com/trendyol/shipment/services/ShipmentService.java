@@ -3,6 +3,7 @@ package com.trendyol.shipment.services;
 import com.trendyol.shipment.Product;
 import com.trendyol.shipment.ShipmentSize;
 import utils.Constants;
+import utils.exceptionMessages.ShipmentExceptionMessage;
 
 
 import java.util.Comparator;
@@ -34,6 +35,9 @@ public class ShipmentService implements IShipmentService {
 
 
     private Map<ShipmentSize, Long> getProductsReverseOrderedBySize() {
+
+        if(productList.isEmpty()) throw new RuntimeException(ShipmentExceptionMessage.BASKET_IS_EMPTY.getMessage());
+
         return productList.stream()
                 .collect(Collectors.groupingBy(
                         Product::getSize,
